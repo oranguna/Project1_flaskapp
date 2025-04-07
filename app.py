@@ -4,12 +4,12 @@ import os
 
 app = Flask(__name__)
 
-DB_HOST = "localhost"  # PostgreSQL server address
-DB_NAME = "your_database_name"  # Your PostgreSQL database name
-DB_USER = "your_user_name"  # Your PostgreSQL username
-DB_PASSWORD = "your_password"  # Your PostgreSQL password
+DB_HOST = "localhost"  
+DB_NAME = "your_database_name"  
+DB_USER = "your_user_name" 
+DB_PASSWORD = "your_password"  
 
-# Initialize the database path for SQL initialization script
+
 INIT_PATH = os.path.join(os.path.dirname(__file__), "init_db.sql")
 
 
@@ -21,7 +21,7 @@ def init_db():
         )
         cursor = conn.cursor()
 
-        # Execute the init_db.sql script to set up the tables
+       
         with open(INIT_PATH, "r") as f:
             cursor.execute(f.read())
 
@@ -57,6 +57,6 @@ def home():
 
 
 if __name__ == "__main__":
-    init_db()  # Initialize the database before running the app
+    init_db()  
     app.run(host="0.0.0.0", port=5000)
 
