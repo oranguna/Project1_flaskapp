@@ -1,62 +1,73 @@
-from flask import Flask, render_template
 import psycopg2
-import os
-
-app = Flask(__name__)
-
-DB_HOST = "localhost"  
-DB_NAME = "your_database_name"  
-DB_USER = "your_user_name" 
-DB_PASSWORD = "your_password"  
 
 
-INIT_PATH = os.path.join(os.path.dirname(__file__), "init_db.sql")
+db_name = "your_database_name"
+db_user = "your_username"
+db_password = "your_password"
+db_host = "localhost"
+db_port = "5432"
+
+try:
+
+    conn = psycopg2.connect(database=db_name, user=db_user, password=db_password, host=db_host, port=db_port)
+
+    
+    cur = conn.cursor()
+
+ 
+    cur.execute("DROP TABLE IF EXISTS employees;")
+    cur.execute("""
+        CREATE TABLE employees (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            age INTEGER,
+            department VARCHAR(255)
+        );
+    """)
 
 
-def init_db():
-    """Initialize the database if it doesn't exist by running the init_db.sql script."""
-    try:
-        conn = psycopg2.connect(
-            dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST
-        )
-        cursor = conn.cursor()
+    cur.execute("INSERT INTO employees (name, age, department) VALUES (%s, %s, %s)", ("Alice", 30, "Sales"))
+    cur.execute("INSERT INTO employees (name, age, department) VALUES (%s, %s, %s)", ("Bob", 25, "Marketing"))
 
-       
-        with open(INIT_PATH, "r") as f:
-            cursor.execute(f.read())
+    
+    cur.execute("SELECT * FROM employees")
+    rows = cur.fetchall()
+    print("Employees:")
+    for row in rows:
+        print(row)
 
-        conn.commit()
-        cursor.close()
+    
+    cur.execute("UPDATE employees SET age = %s WHERE name = %s", (31, "Alice"))
+
+
+    cur.execute("SELECT * FROM employees")
+    rows = cur.fetchall()
+    print("\nUpdated Employees:")
+    for row in rows:
+        print(row)
+
+    
+    cur.execute("DELETE FROM employees WHERE name = %s", ("Bob",))
+
+
+    cur.execute("SELECT * FROM employees")
+    rows = cur.fetchall()
+    print("\nEmployees after deletion:")
+    for row in rows:
+        print(row)
+
+  
+    conn.commit()
+
+except psycopg2.Error as e:
+    print(f"Database error: {e}")
+
+finally:
+   
+    if cur:
+        cur.close()
+    if conn:
         conn.close()
-    except Exception as e:
-        print("Error initializing the database:", e)
-
-
-def get_messages():
-    """Retrieve all messages from the PostgreSQL database."""
-    try:
-        conn = psycopg2.connect(
-            dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST
-        )
-        cursor = conn.cursor()
-        cursor.execute("SELECT message FROM messages")
-        rows = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return [row[0] for row in rows]
-    except Exception as e:
-        print("Error fetching messages:", e)
-        return []
-
-
-@app.route("/")
-def home():
-    """Render the homepage with the messages."""
-    messages = get_messages()
-    return render_template("index.html", messages=messages)
-
-
-if __name__ == "__main__":
-    init_db()  
-    app.run(host="0.0.0.0", port=5000)
+    
+                      
 
