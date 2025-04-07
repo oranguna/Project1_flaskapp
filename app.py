@@ -4,7 +4,6 @@ import os
 
 app = Flask(__name__)
 
-# Set up PostgreSQL connection info (adjust these values to match your setup)
 DB_HOST = "localhost"  # PostgreSQL server address
 DB_NAME = "your_database_name"  # Your PostgreSQL database name
 DB_USER = "your_user_name"  # Your PostgreSQL username

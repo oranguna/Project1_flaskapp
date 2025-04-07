@@ -3,4 +3,4 @@ CREATE TABLE messages (
   message TEXT
 );
 
-INSERT INTO messages (message) VALUES ('Hello from SQLite!'), ('Deployed with Ansible'), ('Artifact stored in S3');
+INSERT INTO messages (message) VALUES ('Hello I am a Devops Engineer!'), ('Deployed with Ansible'), ('Artifact stored in S3');
